@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>German Vocabulary Story Maker</title>
+    <style>
+        .vocab-word { cursor: pointer; margin: 5px; padding: 5px; display: inline-block; }
+        .selected { background-color: #cceeff; }
+    </style>
+</head>
+<body>
+    <h1>My German Vocabulary</h1>
+    <div id="word-container">
+        <span class="vocab-word">Haus</span>
+        <span class="vocab-word">Baum</span>
+        <span class="vocab-word">Auto</span>
+        <span class="vocab-word">Hund</span>
+        <!-- Add more words as needed -->
+    </div>
+    <button id="generate-story">Generate Story</button>
+    
+    <script>
+        const selectedWords = new Set();
+        document.querySelectorAll('.vocab-word').forEach(word => {
+            word.addEventListener('click', () => {
+                word.classList.toggle('selected');
+                if (selectedWords.has(word.innerText)) {
+                    selectedWords.delete(word.innerText);
+                } else {
+                    selectedWords.add(word.innerText);
+                }
+            });
+        });
+
+        document.getElementById('generate-story').addEventListener('click', () => {
+            const wordsArray = Array.from(selectedWords);
+            alert("Selected words: " + wordsArray.join(", "));
+            // Here you could send 'wordsArray' to ChatGPT via an API call
+        });
+    </script>
+</body>
+</html>
