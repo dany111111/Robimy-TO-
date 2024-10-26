@@ -1,42 +1,96 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>German Vocabulary Story Maker</title>
+    <title>Niemieckie Słownictwo - Generator Opowieści</title>
     <style>
-        .vocab-word { cursor: pointer; margin: 5px; padding: 5px; display: inline-block; }
-        .selected { background-color: #cceeff; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .slowo {
+            cursor: pointer;
+            margin: 5px;
+            padding: 5px;
+            display: inline-block;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+        }
+        .zaznaczone {
+            background-color: #cceeff;
+        }
+        #lista-wybranych {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+        }
     </style>
 </head>
 <body>
-    <h1>My German Vocabulary</h1>
-    <div id="word-container">
-        <span class="vocab-word">Haus</span>
-        <span class="vocab-word">Baum</span>
-        <span class="vocab-word">Auto</span>
-        <span class="vocab-word">Hund</span>
-        <!-- Add more words as needed -->
-    </div>
-    <button id="generate-story">Generate Story</button>
+    <h1>Moje Słownictwo Niemieckie</h1>
+    <input type="text" id="nowe-slowo" placeholder="Dodaj nowe słowo" />
+    <button id="dodaj-slowo">Dodaj słowo</button>
+    
+    <h2>Dodane Słowa</h2>
+    <div id="kontener-slow"></div>
+    
+    <h2>Wybrane Słowa</h2>
+    <div id="lista-wybranych"></div>
+    
+    <button id="generuj-opowiesc">Generuj Opowieść</button>
     
     <script>
-        const selectedWords = new Set();
-        document.querySelectorAll('.vocab-word').forEach(word => {
-            word.addEventListener('click', () => {
-                word.classList.toggle('selected');
-                if (selectedWords.has(word.innerText)) {
-                    selectedWords.delete(word.innerText);
-                } else {
-                    selectedWords.add(word.innerText);
-                }
-            });
+        const kontenerSlow = document.getElementById('kontener-slow');
+        const listaWybranych = document.getElementById('lista-wybranych');
+        const noweSlowoInput = document.getElementById('nowe-slowo');
+        const wybraneSlowa = new Set();
+
+        document.getElementById('dodaj-slowo').addEventListener('click', () => {
+            const noweSlowo = noweSlowoInput.value.trim();
+            if (noweSlowo) {
+                const slowoDiv = document.createElement('div');
+                slowoDiv.innerText = noweSlowo;
+                slowoDiv.className = 'slowo';
+                slowoDiv.onclick = () => {
+                    slowoDiv.classList.toggle('zaznaczone');
+                    if (wybraneSlowa.has(noweSlowo)) {
+                        wybraneSlowa.delete(noweSlowo);
+                    } else {
+                        wybraneSlowa.add(noweSlowo);
+                    }
+                    aktualizujListe();
+                };
+                kontenerSlow.appendChild(slowoDiv);
+                noweSlowoInput.value = '';
+            }
         });
 
-        document.getElementById('generate-story').addEventListener('click', () => {
-            const wordsArray = Array.from(selectedWords);
-            alert("Selected words: " + wordsArray.join(", "));
-            // Here you could send 'wordsArray' to ChatGPT via an API call
+        function aktualizujListe() {
+            listaWybranych.innerHTML = Array.from(wybraneSlowa).join(', ');
+        }
+
+        document.getElementById('generuj-opowiesc').addEventListener('click', async () => {
+            const slowaArray = Array.from(wybraneSlowa);
+            if (slowaArray.length === 0) {
+                alert("Proszę zaznaczyć przynajmniej jedno słowo!");
+                return;
+            }
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer YOUR_API_KEY', // Zastąp 'YOUR_API_KEY' swoim kluczem API
+                },
+                body: JSON.stringify({
+                    model: 'gpt-3.5-turbo', // lub inny model
+                    messages: [{ role: 'user', content: `Napisz krótką bajkę używając słów: ${slowaArray.join(', ')}` }]
+                }),
+            });
+            const data = await response.json();
+            alert(data.choices[0].message.content);
         });
     </script>
 </body>
