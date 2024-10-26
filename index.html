@@ -27,6 +27,13 @@
             border: 1px solid #ccc;
             background-color: #fff;
         }
+        #wygenerowana-opowiesc {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            min-height: 100px; /* Ustal minimalną wysokość dla lepszej estetyki */
+        }
     </style>
 </head>
 <body>
@@ -41,10 +48,14 @@
     <div id="lista-wybranych"></div>
     
     <button id="generuj-opowiesc">Generuj Opowieść</button>
+
+    <h2>Wygenerowana Opowieść</h2>
+    <div id="wygenerowana-opowiesc"></div>
     
     <script>
         const kontenerSlow = document.getElementById('kontener-slow');
         const listaWybranych = document.getElementById('lista-wybranych');
+        const wygenerowanaOpowiesc = document.getElementById('wygenerowana-opowiesc');
         const noweSlowoInput = document.getElementById('nowe-slowo');
         const wybraneSlowa = new Set();
 
@@ -85,12 +96,12 @@
                     'Authorization': 'Bearer YOUR_API_KEY', // Zastąp 'YOUR_API_KEY' swoim kluczem API
                 },
                 body: JSON.stringify({
-                    model: 'gpt-3.5-turbo', // lub inny model
+                    model: 'gpt-3.5-turbo',
                     messages: [{ role: 'user', content: `Napisz krótką bajkę używając słów: ${slowaArray.join(', ')}` }]
                 }),
             });
             const data = await response.json();
-            alert(data.choices[0].message.content);
+            wygenerowanaOpowiesc.innerText = data.choices[0].message.content; // Wyświetl opowieść w divie
         });
     </script>
 </body>
